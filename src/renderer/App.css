@@ -2,6 +2,7 @@
   --Semi-Black: #080808;
   --Dark-Grey: #1d1d1d;
   --Semi-White: #f4f4f4;
+  --CornerSize: 15px;
 }
 
 * {
@@ -22,15 +23,36 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  border-radius: 10px;
+  border-radius: var(--CornerSize);
   margin: 15px;
   height: 80%;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--Semi-White);
-  border-radius: 10px;
+  border-radius: var(--CornerSize);
   height: 80%;
+}
+
+#Title {
+  font-weight: bold;
+}
+
+#DeckName {
+  color: var(--Semi-White);
+  font-weight: bold;
+  height: 50px;
+  font-size: 25px;
+  border-radius: var(--CornerSize);
+  border: none;
+  outline: none;
+  text-align: center;
+  background-color: var(--Semi-Black);
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 100%;
+  min-height: 50px;
+  overflow-y: hidden;
 }
 
 .AppBody {
@@ -61,6 +83,7 @@ body {
   height: 100%;
   width: 300px;
   align-items: center;
+  justify-content: space-between;
   overflow: hidden;
   transition-duration: 0.5s;
   color: var(--Semi-White);
@@ -78,10 +101,64 @@ body {
   }
 }
 
+.VisibleSchedules {
+  overflow-y: scroll;
+  max-height: 30%;
+  min-height: 30%;
+  min-width: 100%;
+  max-width: 100%;
+  background-color: var(--Semi-Black);
+  padding-left: 12px;
+  border-radius: var(--CornerSize);
+}
+
+.ScheduleCheckbox {
+  display: flex;
+  align-content: center;
+  text-align: center;
+}
+
+.WeeklyTime {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--CornerSize);
+  height: 100%;
+}
+
+#TimeFormat {
+  background: var(--Dark-Grey);
+  border-radius: 8px;
+  color: var(--Semi-White);
+  border: none;
+  outline: none;
+  padding: 4px;
+  margin-right: 12px;
+  font-size: 12px;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
+}
+
+#TimeFormat:hover {
+  background: var(--Semi-Black);
+  cursor: pointer;
+}
+
+.TimeElements {
+  font-size: 12px;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: end;
+  padding-right: 12px;
+  color: var(--Semi-White);
+  list-style-type: none;
+}
+
 .WeeklyBody {
   background-color: var(--Dark-Grey);
   display: flex;
-  border-radius: 15px;
+  border-radius: var(--CornerSize);
   height: 100%;
   min-width: 630px;
   max-width: 630px;
@@ -89,15 +166,118 @@ body {
   overflow: hidden;
 }
 
+.DayText {
+  align-self: center;
+  margin-bottom: 6px;
+}
+
 .DayDivider {
+  font-size: 12px;
   display: flex;
+  flex-direction: column;
   min-width: 90px;
   max-width: 90px;
   border-right: 1px solid rgba(255, 255, 255, 0.15);
-  justify-content: center;
+  justify-content: flex-start;
+  align-content: center;
   padding: 4px;
 }
 
-#EndDay {
+.DayDivider.EndDay {
   border-right: 0px solid var(--Semi-White);
+}
+
+.EventOverlay {
+  background-color: rgba(0, 0, 255, 0.1);
+  border-radius: 4px;
+  outline: blue solid 2px;
+  padding: 4px;
+  margin: 4px 0;
+  color: white;
+}
+
+
+.NewWeeklyBody {
+  background: var(--Dark-Grey);
+  background: linear-gradient(90deg, var(--Dark-Grey) 0%, var(--Semi-Black) 84%);
+  background-size: 430px 1px;
+  background-position: -100px;
+  display: flex;
+  border-radius: var(--CornerSize);
+  height: 100%;
+  min-width: 230px;
+  max-width: 230px;
+  margin-right: 20px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
+}
+
+.NewWeeklyBody:hover {
+  background-position: 0px;
+  cursor: pointer;
+}
+
+.SideBarCal {
+  display: flex;
+  align-self: flex-end;
+  justify-self: flex-end;
+  margin-bottom: 12px;
+  min-height: 500px;
+}
+
+#DateDisplay {
+  display: flex;
+  align-self: center;
+  justify-self: center;
+  align-content: center;
+  justify-content: center;
+}
+
+.AddCircle {
+  font-size: 25px;
+}
+
+#MonthName {
+  font-size: 20px;
+  min-width: 105px;
+  max-width: 105px;
+}
+
+.MonthButton {
+  height: 50%;
+  aspect-ratio: 1 / 1;
+  text-align: center;
+  align-self: center;
+  margin: 8px;
+  color: var(--Semi-White);
+  background: rgba(0, 0, 0, 0);
+  border-radius: 50%;
+  border: none;
+  outline: none;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
+  cursor: pointer;
+}
+
+.MonthButton:hover {
+  background: var(--Semi-Black)
+}
+
+#YearNum {
+  color: var(--Semi-White);
+  font-weight: bold;
+  height: 50px;
+  width: 30%;
+  font-size: 20px;
+  border-radius: var(--CornerSize);
+  border: none;
+  outline: none;
+  text-align: center;
+  background-color: var(--Semi-Black);
+  padding-left: 4px;
+  padding-right: 4px;
+  align-self: center;
 }
