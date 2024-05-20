@@ -12,13 +12,19 @@ function Home() {
     setFileDataList(prevData => [...prevData, data]);
   };
 
+  const [selectedWeekRange, setSelectedWeekRange] = useState(null);
+
+    const updateSelectedWeekRange = (range) => {
+        setSelectedWeekRange(range);
+    };
+
   return (
     <div className="AppBody">
-      <Sidebar />
+      <Sidebar updateSelectedWeekRange={updateSelectedWeekRange} />
       <div className="AppContent">
-        <WeeklyTime />
+      <WeeklyTime/>
         {fileDataList.map((fileData, index) => (
-          <WeeklyCard key={index} fileData={fileData} />
+          <WeeklyCard key={index} fileData={fileData} range={selectedWeekRange} />
         ))}
         <NewWeeklyCard onFileRead={handleFileData} />
       </div>

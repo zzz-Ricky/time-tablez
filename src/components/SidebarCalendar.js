@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function SidebarCalendar() {
-    const [month, setMonth] = useState(1);
-    const [year, setYear] = useState(2021);
+function SidebarCalendar({ updateSelectedWeekRange }) {
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1; // getMonth() is zero-based
+    const currentYear = today.getFullYear();
+    const currentDay = today.getDate();
+
+    const [month, setMonth] = useState(currentMonth);
+    const [year, setYear] = useState(currentYear);
+    const [selectedWeek, setSelectedWeek] = useState(null);
 
     const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
@@ -34,6 +40,37 @@ function SidebarCalendar() {
         }
     };
 
+    const handleWeekClick = (week) => {
+        setSelectedWeek(week);
+    };
+
+    const calculateWeekRange = (week) => {
+        if (week === null) return null;
+
+        const startOfWeek = (week * 7) + 1 - new Date(year, month - 1, 1).getDay();
+        const endOfWeek = startOfWeek + 6;
+
+        const startDate = new Date(year, month - 1, startOfWeek);
+        const endDate = new Date(year, month - 1, Math.min(endOfWeek, daysInMonth(month, year)));
+
+        return { start: startDate, end: endDate };
+    };
+
+    const calculateCurrentWeek = () => {
+        const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
+        const currentWeek = Math.floor((currentDay + firstDayOfMonth - 1) / 7);
+        return currentWeek;
+    };
+
+    useEffect(() => {
+        setSelectedWeek(calculateCurrentWeek());
+    }, [month, year]);
+
+    useEffect(() => {
+        const selectedWeekRange = calculateWeekRange(selectedWeek);
+        updateSelectedWeekRange(selectedWeekRange);
+    }, [selectedWeek, month, year]);
+
     return (
         <div>
             <div id='DateDisplay'>
@@ -51,9 +88,7 @@ function SidebarCalendar() {
             </div>
             <br />
 
-            <table align="center" cellSpacing="4" cellPadding="6">
-                <caption align="top"></caption>
-
+            <table cellSpacing="4" cellPadding="8" id='DateTable'>
                 <thead>
                     <tr>
                         <th>S</th>
@@ -68,11 +103,16 @@ function SidebarCalendar() {
 
                 <tbody>
                     {[...Array(Math.ceil((daysInMonth(month, year) + new Date(year, month - 1, 1).getDay()) / 7))].map((_, week) => (
-                        <tr key={week}>
+                        <tr
+                            key={week}
+                            id={selectedWeek === week ? 'SelectedWeek' : 'UnSelectedWeek'}
+                            className='DateWeek'
+                            onClick={() => handleWeekClick(week)}
+                        >
                             {[...Array(7)].map((_, day) => {
                                 const dayNumber = (week * 7) + day + 1 - new Date(year, month - 1, 1).getDay();
                                 return (
-                                    <td key={day}>
+                                    <td key={day} id='DateDay'>
                                         {dayNumber > 0 && dayNumber <= daysInMonth(month, year) ? dayNumber : ''}
                                     </td>
                                 );

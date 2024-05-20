@@ -43,7 +43,6 @@ export function parseICS(icsData) {
                   event[propertyName].push(propertyValue);
               }
               event[propertyName] = propertyValue;
-              console.log(propertyName,": ",event[propertyName]);
           }
       }
   }
@@ -51,18 +50,34 @@ export function parseICS(icsData) {
   return events;
 }
 
+  // Function to parse ICS DTSTART to Date object
+export function parseICSToDate(dateTimeString) {
+    const year = dateTimeString.substr(0, 4);
+    const month = parseInt(dateTimeString.substr(4, 2)) - 1; // Month is zero-based in JavaScript Date object
+    const day = dateTimeString.substr(6, 2);
+    const hour = dateTimeString.substr(9, 2);
+    const minute = dateTimeString.substr(11, 2);
+    const second = dateTimeString.substr(13, 2);
+    return new Date(year, month, day, hour, minute, second);
+  };
+
 export function groupEventsByDay(events) {
   let eventsByDay = {};
-
-  for (const event of events) {
+  console.log("events: ", events)
+  for (const event in events) {
     // Ensure the event has the necessary properties
-    if (event && event.DTSTART instanceof Date) {
-      let recurrenceDays = [event.DTSTART.getDay()]; // Initial day
+    console.log("event: ", events[event])
+    if (events[event] && events[event].DTSTART) {
+      const startDate = parseICSToDate(events[event].DTSTART);
+      console.log("CHECKPOINT1", startDate);
+      if (isNaN(startDate)) continue;
+
+      let recurrenceDays = [startDate.getDay()]; // Initial day
 
       // Check if the event has a recurrence rule (RRULE)
-      if (event.RRULE) {
+      if (events[event].RRULE) {
         // For simplicity, assume daily recurrence
-        const recurrenceRule = event.RRULE.toUpperCase();
+        const recurrenceRule = events[event].RRULE.toUpperCase();
         if (recurrenceRule.includes("FREQ=DAILY")) {
           // Extract the count or until from RRULE to determine the range of recurrence
           let range = Infinity; // Default to infinite recurrence
@@ -71,23 +86,23 @@ export function groupEventsByDay(events) {
           if (countMatch) {
             range = parseInt(countMatch[1]);
           } else if (untilMatch) {
-            const untilDate = new Date(untilMatch[1]);
-            const today = new Date();
-            range = Math.ceil((untilDate - today) / (1000 * 60 * 60 * 24)); // Calculate remaining days until untilDate
+            const untilDate = parseICSToDate(untilMatch[1]);
+            range = Math.ceil((untilDate - startDate) / (1000 * 60 * 60 * 24)) + 1; // Calculate days including the start date
           }
 
           // Update recurrenceDays with additional days based on range
           for (let i = 1; i < range; i++) {
-            const nextDay = (recurrenceDays[recurrenceDays.length - 1] + 1) % 7; // Increment day cyclically
-            recurrenceDays.push(nextDay);
+            const nextDay = parseICSToDate(startDate);
+            nextDay.setDate(startDate.getDate() + i);
+            recurrenceDays.push(nextDay.getDay());
           }
         }
       }
 
       // Exclude dates specified in EXDATE
-      if (event.EXDATE && Array.isArray(event.EXDATE)) {
-        event.EXDATE.forEach(excludedDate => {
-          const excludedDay = new Date(excludedDate).getDay();
+      if (events[event].EXDATE && Array.isArray(events[event].EXDATE)) {
+        events[event].EXDATE.forEach(excludedDate => {
+          const excludedDay = parseICSToDate(excludedDate).getDay();
           const index = recurrenceDays.indexOf(excludedDay);
           if (index !== -1) {
             recurrenceDays.splice(index, 1); // Remove excluded date from recurrence days
@@ -98,20 +113,16 @@ export function groupEventsByDay(events) {
       // Group the event under each recurrence day
       for (const dayIndex of recurrenceDays) {
         const day = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayIndex];
-
         // Ensure the day exists in the eventsByDay object
         if (!eventsByDay[day]) {
           eventsByDay[day] = [];
         }
 
         // Push the event to the corresponding day's array
-        eventsByDay[day].push(event);
+        eventsByDay[day].push(events[event]);
       }
     }
   }
-
-  console.log("Events by day:", eventsByDay);
+  console.log("eventsByDay", eventsByDay);
   return eventsByDay;
 }
-
-

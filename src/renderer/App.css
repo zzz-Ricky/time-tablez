@@ -88,16 +88,22 @@ body {
   transition-duration: 0.5s;
   color: var(--Semi-White);
   box-shadow: 4px 0px 4px rgba(255, 255, 255, 0.15);
-  ;
   padding-left: 14px;
   padding-right: 14px;
   z-index: 1;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 1000px) {
   .SideBarBody {
-    width: 200px;
+    min-width: 250px;
     height: 100%;
+  }
+
+  .SideBarCal {
+    max-width: 200px;
+    align-content: center;
+    align-self: center;
+    justify-content: center;
   }
 }
 
@@ -222,8 +228,9 @@ body {
 
 .SideBarCal {
   display: flex;
-  align-self: flex-end;
   justify-self: flex-end;
+  align-self: center;
+  align-content: center;
   margin-bottom: 12px;
   min-height: 500px;
 }
@@ -231,9 +238,56 @@ body {
 #DateDisplay {
   display: flex;
   align-self: center;
-  justify-self: center;
   align-content: center;
   justify-content: center;
+}
+
+#DateTable {
+  align-self: center;
+  align-content: center;
+  border-spacing: 0px;
+}
+
+.DateWeek {
+  transition-duration: 0.1s;
+  transition-timing-function: ease-in;
+  border-radius: var(--CornerSize);
+  border: var(--CornerSize);
+  overflow: hidden;
+  border-collapse: separate;
+  background-clip: padding-box;
+}
+
+td:first-child,
+th:first-child {
+  border-radius: var(--CornerSize) 0 0 var(--CornerSize);
+}
+
+td:last-child,
+th:last-child {
+  border-radius: 0 var(--CornerSize) var(--CornerSize) 0;
+}
+
+#UnSelectedWeek:hover {
+  background: linear-gradient(90deg, var(--Dark-Grey) 0%, var(--Semi-Black) 84%);
+  background-size: 200% 1px;
+  background-position: 0px;
+}
+
+#SelectedWeek {
+  background: linear-gradient(90deg, var(--Dark-Grey) 0%, var(--Semi-Black) 84%);
+  background-size: 200% 1px;
+  background-position: 300px;
+}
+
+#SelectedWeek:hover {
+  background-position: 0px;
+}
+
+#DateDay {
+  overflow: hidden;
+  transition-duration: 0.1s;
+  transition-timing-function: ease-in;
 }
 
 .AddCircle {
@@ -277,7 +331,5 @@ body {
   outline: none;
   text-align: center;
   background-color: var(--Semi-Black);
-  padding-left: 4px;
-  padding-right: 4px;
   align-self: center;
 }

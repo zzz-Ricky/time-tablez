@@ -2,7 +2,7 @@ import React from 'react';
 import '../renderer/App.css';
 import SidebarCalendar from './SidebarCalendar';
 
-function Sidebar() {
+function Sidebar({ updateSelectedWeekRange }) {
   return (
     <div className="SideBarBody">
       <h1 id='Title'>TimeTablez</h1>
@@ -53,7 +53,7 @@ function Sidebar() {
         </label>
       </div>
       <div className='SideBarCal'>
-        <SidebarCalendar/>
+      <SidebarCalendar updateSelectedWeekRange={updateSelectedWeekRange} />
       </div>
 
     </div>
