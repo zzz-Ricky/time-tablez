@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { parseICS, parseICSToDate, groupEventsByDay } from '../scripts/icsParser';
+import { parseICS, getTimeZoneID, handleTimeZoneDTSTART, parseICSToDate, groupEventsByDay } from '../scripts/icsParser';
 
 function WeeklyCard({ fileData, range }) {
   const [eventsByDay, setEventsByDay] = useState({});
@@ -8,14 +8,15 @@ function WeeklyCard({ fileData, range }) {
     if (fileData && range) {
       const events = parseICS(fileData);
       const filteredEvents = events.filter(event => {
-        const eventDate = parseICSToDate(event.DTSTART); // Convert DTSTART to Date object
-        // console.log("eventDate", eventDate);
-        // console.log("range.start", range.start);
-        return eventDate >= new Date(range.start) && eventDate <= new Date(range.end);
+        const startDate = handleTimeZoneDTSTART(event);
+        let eventDate;
+          if(startDate){
+            eventDate = parseICSToDate(event[startDate[0]]); // Convert DTSTART to Date object
+            return eventDate >= new Date(range.start) && eventDate <= new Date(range.end);
+          }
       });
-      // console.log("unfilteredEvents", events)
-      // console.log("filteredEvents", filteredEvents)
-      const updatedEventsByDay = groupEventsByDay(filteredEvents); // Use filteredEvents
+      const updatedEventsByDay = groupEventsByDay(filteredEvents);
+      console.log('eventsByDay', updatedEventsByDay)
       setEventsByDay(updatedEventsByDay);
     }
   }, [fileData, range]);
@@ -31,7 +32,7 @@ function WeeklyCard({ fileData, range }) {
             <div key={eventIndex} className='EventOverlay'>
               {/* Display event details */}
               <div>{event.SUMMARY}</div>
-              <div>{event.DTSTART && parseICSToDate(event.DTSTART).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+              <div>{event[handleTimeZoneDTSTART(event)[0]] && parseICSToDate(event[handleTimeZoneDTSTART(event)[0]]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
               <div>{event.LOCATION}</div>
               <div>{event.DESCRIPTION}</div>
             </div>

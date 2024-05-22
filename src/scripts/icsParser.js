@@ -46,8 +46,22 @@ export function parseICS(icsData) {
           }
       }
   }
-  console.log("Events", events);
+  // console.log("Events", events);
   return events;
+}
+
+export function getTimeZoneID() {
+  const date = new Date();
+  const options = { timeZoneName: 'short' };
+  const timeZoneAbbreviation = new Intl.DateTimeFormat('en-US', options).formatToParts(date).find(part => part.type === 'timeZoneName').value;
+  return timeZoneAbbreviation;
+}
+
+export function handleTimeZoneDTSTART(events) {
+  var values = Object.keys(events).filter(function(el) {
+    return /^DTSTART.*?/i.test(el);
+  });
+  return values;
 }
 
   // Function to parse ICS DTSTART to Date object
@@ -61,68 +75,146 @@ export function parseICSToDate(dateTimeString) {
     return new Date(year, month, day, hour, minute, second);
   };
 
-export function groupEventsByDay(events) {
-  let eventsByDay = {};
-  console.log("events: ", events)
-  for (const event in events) {
-    // Ensure the event has the necessary properties
-    console.log("event: ", events[event])
-    if (events[event] && events[event].DTSTART) {
-      const startDate = parseICSToDate(events[event].DTSTART);
-      console.log("CHECKPOINT1", startDate);
-      if (isNaN(startDate)) continue;
+  export function groupEventsByDay(events) {
+    let eventsByDay = {};
 
-      let recurrenceDays = [startDate.getDay()]; // Initial day
+    for (const eventIndex in events) {
+      const event = events[eventIndex];
+      const DTSTART = handleTimeZoneDTSTART(event);
 
-      // Check if the event has a recurrence rule (RRULE)
-      if (events[event].RRULE) {
-        // For simplicity, assume daily recurrence
-        const recurrenceRule = events[event].RRULE.toUpperCase();
-        if (recurrenceRule.includes("FREQ=DAILY")) {
-          // Extract the count or until from RRULE to determine the range of recurrence
-          let range = Infinity; // Default to infinite recurrence
-          const countMatch = recurrenceRule.match(/COUNT=(\d+)/);
-          const untilMatch = recurrenceRule.match(/UNTIL=(\d{8}T\d{6}Z)/);
-          if (countMatch) {
-            range = parseInt(countMatch[1]);
-          } else if (untilMatch) {
-            const untilDate = parseICSToDate(untilMatch[1]);
-            range = Math.ceil((untilDate - startDate) / (1000 * 60 * 60 * 24)) + 1; // Calculate days including the start date
-          }
+      if (event && event[DTSTART[0]]) {
+        const startDate = parseICSToDate(event[DTSTART[0]]);
+        if (isNaN(startDate)) continue;
 
-          // Update recurrenceDays with additional days based on range
-          for (let i = 1; i < range; i++) {
-            const nextDay = parseICSToDate(startDate);
-            nextDay.setDate(startDate.getDate() + i);
-            recurrenceDays.push(nextDay.getDay());
-          }
+        let recurrenceDays = [startDate.getDay()]; // Initial day
+
+        console.log('recurrenceDays', recurrenceDays)
+        if (event.RRULE) {
+          const recurrenceRules = event.RRULE.split(';');
+          recurrenceRules.forEach(rule => {
+            const [key, value] = rule.split('=');
+            if (key === 'FREQ') {
+              if (value === 'DAILY') {
+                let range = Infinity;
+                const countMatch = event.RRULE.match(/COUNT=(\d+)/);
+                const untilMatch = event.RRULE.match(/UNTIL=(\d{8}T\d{6}Z)/);
+                if (countMatch) {
+                  range = parseInt(countMatch[1]);
+                } else if (untilMatch) {
+                  const untilDate = new Date(untilMatch[1]);
+                  range = Math.ceil((untilDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                }
+                for (let i = 1; i < range; i++) {
+                  const nextDay = new Date(startDate);
+                  nextDay.setDate(startDate.getDate() + i);
+                  recurrenceDays.push(nextDay.getDay());
+                }
+              } else if (value === 'WEEKLY') {
+                const weekDays = event.RRULE.match(/BYDAY=([A-Z,]+)/)[1].split(',');
+                const startDay = startDate.getDay();
+                weekDays.forEach(day => {
+                  const diff = ('SU MO TU WE TH FR SA'.indexOf(day) - startDay + 7) % 7;
+                  const nextDay = new Date(startDate);
+                  nextDay.setDate(startDate.getDate() + diff);
+                  recurrenceDays.push(nextDay.getDay());
+                });
+              } else if (value === 'MONTHLY') {
+                const startDayOfMonth = startDate.getDate();
+                const byMonthDayMatch = event.RRULE.match(/BYMONTHDAY=(\d+)/);
+                const byWeekDayMatch = event.RRULE.match(/BYDAY=([-+]?\d+)([A-Z]+)/);
+                if (byMonthDayMatch) {
+                  const monthDay = parseInt(byMonthDayMatch[1]);
+                  const maxDays = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+                  const monthDays = [];
+                  for (let i = monthDay; i <= maxDays; i += parseInt(byMonthDayMatch[1])) {
+                    monthDays.push(i);
+                  }
+                  monthDays.forEach(day => {
+                    const nextDay = new Date(startDate);
+                    nextDay.setDate(day);
+                    recurrenceDays.push(nextDay.getDay());
+                  });
+                } else if (byWeekDayMatch) {
+                  const weekDay = byWeekDayMatch[1];
+                  const weekIndex = byWeekDayMatch[2];
+                  let targetDayIndex = startDate.getDay();
+                  const targetDate = new Date(startDate);
+                  if (weekIndex === 'SU') {
+                    targetDate.setDate(1); // Move to the first day of the month
+                    targetDayIndex = targetDate.getDay(); // Get the weekday index of the first day
+                  }
+                  const dayOfWeek = 'SU MO TU WE TH FR SA'.indexOf(weekDay);
+                  const diff = dayOfWeek - targetDayIndex;
+                  let targetDateOfMonth = 1 + diff;
+                  if (diff < 0) targetDateOfMonth += 7; // Move to the next week if needed
+                  targetDate.setDate(targetDateOfMonth);
+                  while (targetDate.getMonth() === startDate.getMonth()) {
+                    recurrenceDays.push(targetDate.getDay());
+                    targetDate.setDate(targetDate.getDate() + 7);
+                  }
+                }
+              } else if (value === 'YEARLY') {
+                const yearDaysMatch = event.RRULE.match(/BYYEARDAY=(\d+)/);
+                const monthDaysMatch = event.RRULE.match(/BYMONTHDAY=(\d+)/);
+                const monthWeekDaysMatch = event.RRULE.match(/BYDAY=([-+]?\d+)([A-Z]+)/);
+                if (yearDaysMatch) {
+                  const yearDay = parseInt(yearDaysMatch[1]);
+                  const targetDate = new Date(startDate.getFullYear(), 0); // Start from January
+                  targetDate.setDate(yearDay);
+                  while (targetDate.getFullYear() === startDate.getFullYear()) {
+                    recurrenceDays.push(targetDate.getDay());
+                    targetDate.setDate(targetDate.getDate() + 365); // Assuming no leap years for simplicity
+                  }
+                } else if (monthDaysMatch) {
+                  const monthDay = parseInt(monthDaysMatch[1]);
+                  const maxDays = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+                  const monthDays = [];
+                  for (let i = monthDay; i <= maxDays; i += parseInt(monthDaysMatch[1])) {
+                    monthDays.push(i);
+                  }
+                  monthDays.forEach(day => {
+                    const nextDate = new Date(startDate.getFullYear(), startDate.getMonth(), day);
+                    recurrenceDays.push(nextDate.getDay());
+                  });
+                } else if (monthWeekDaysMatch) {
+                  const weekDay = monthWeekDaysMatch[1];
+                  const weekIndex = monthWeekDaysMatch[2];
+                  let targetDate = new Date(startDate.getFullYear(), 0); // Start from January
+                  const dayOfWeek = 'SU MO TU WE TH FR SA'.indexOf(weekDay);
+                  const diff = dayOfWeek - targetDate.getDay();
+                  let targetDateOfMonth = 1 + diff;
+                  if (diff < 0) targetDateOfMonth += 7; // Move to the next week if needed
+                  targetDate.setDate(targetDateOfMonth);
+                  if (weekIndex === 'SU') {
+                    targetDate.setDate(1); // Move to the first day of the month
+                    targetDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDateOfMonth);
+                  }
+                  while (targetDate.getFullYear() === startDate.getFullYear()) {
+                    recurrenceDays.push(targetDate.getDay());
+                    targetDate.setDate(targetDate.getDate() + 7);
+                  }
+                }
+              }
+            }
+          });
         }
-      }
-
-      // Exclude dates specified in EXDATE
-      if (events[event].EXDATE && Array.isArray(events[event].EXDATE)) {
-        events[event].EXDATE.forEach(excludedDate => {
-          const excludedDay = parseICSToDate(excludedDate).getDay();
-          const index = recurrenceDays.indexOf(excludedDay);
-          if (index !== -1) {
-            recurrenceDays.splice(index, 1); // Remove excluded date from recurrence days
-          }
-        });
-      }
-
-      // Group the event under each recurrence day
-      for (const dayIndex of recurrenceDays) {
-        const day = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayIndex];
-        // Ensure the day exists in the eventsByDay object
-        if (!eventsByDay[day]) {
-          eventsByDay[day] = [];
+        if (event.EXDATE && Array.isArray(event.EXDATE)) {
+          event.EXDATE.forEach(excludedDate => {
+            const excludedDay = parseICSToDate(excludedDate).getDay();
+            const index = recurrenceDays.indexOf(excludedDay);
+            if (index !== -1) {
+              recurrenceDays.splice(index, 1);
+            }
+          });
         }
-
-        // Push the event to the corresponding day's array
-        eventsByDay[day].push(events[event]);
+        for (const dayIndex of recurrenceDays) {
+          const day = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayIndex];
+          if (!eventsByDay[day]) {
+            eventsByDay[day] = [];
+          }
+          eventsByDay[day].push(event);
+        }
       }
     }
+    return eventsByDay;
   }
-  console.log("eventsByDay", eventsByDay);
-  return eventsByDay;
-}
