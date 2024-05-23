@@ -64,6 +64,13 @@ export function handleTimeZoneDTSTART(events) {
   return values;
 }
 
+export function handleTimeZoneDTEND(events) {
+  var values = Object.keys(events).filter(function(el) {
+    return /^DTEND.*?/i.test(el);
+  });
+  return values;
+}
+
   // Function to parse ICS DTSTART to Date object
 export function parseICSToDate(dateTimeString) {
     const year = dateTimeString.substr(0, 4);
@@ -74,6 +81,42 @@ export function parseICSToDate(dateTimeString) {
     const second = dateTimeString.substr(13, 2);
     return new Date(year, month, day, hour, minute, second);
   };
+
+  export function parseICSToPosition(dateTimeString) {
+    const hour = dateTimeString.substr(9, 2);
+    const minute = dateTimeString.substr(11, 2);
+    const second = dateTimeString.substr(13, 2);
+    const overallTime = (Number(hour) + Number(minute/60) + Number(second/3600))/24;
+    const overallPosition = (overallTime*920)+60;
+    console.log("Overall time", overallTime)
+    return overallPosition;
+  };
+  export function parseICSToLength(InitialTime, EndTime) {
+    // Initial Time
+    const initHour = InitialTime.substr(9, 2);
+    const initMinute = InitialTime.substr(11, 2);
+    const initSecond = InitialTime.substr(13, 2);
+    const initTimeSum = (Number(initHour) + Number(initMinute/60) + Number(initSecond/3600))/24;
+    // End Time
+    const endHour = EndTime.substr(9, 2);
+    const endMinute = EndTime.substr(11, 2);
+    const endSecond = EndTime.substr(13, 2);
+    const endTimeSum = (Number(endHour) + Number(endMinute/60) + Number(endSecond/3600))/24;
+    // Calculate difference to find height
+    const overallTime = endTimeSum-initTimeSum;
+    if (overallTime > 0){
+      const overallHeight = (overallTime*920);;
+      return overallHeight;
+    }
+    else{
+      return 980;
+    }
+
+    const overallPosition = (overallTime*920)+60;
+    console.log("Overall time", overallTime)
+    return overallPosition;
+  };
+
 
   export function groupEventsByDay(events) {
     let eventsByDay = {};

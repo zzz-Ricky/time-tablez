@@ -200,6 +200,18 @@ body {
   padding: 4px;
   margin: 4px 0;
   color: white;
+  position: absolute;
+  min-width: 82px;
+  max-width: 82px;
+  overflow: hidden;
+}
+
+.EventOverlay:hover {
+  overflow-wrap: break-word;
+  min-width: 200px;
+  min-height: 200px;
+  z-index: 5;
+  backdrop-filter: blur(10px);
 }
 
 
