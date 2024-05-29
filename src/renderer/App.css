@@ -172,6 +172,33 @@ body {
   overflow: hidden;
 }
 
+.WeeklyBody:hover .DeleteButton,
+.DeleteButton:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.DeleteButton {
+  background-color: rgba(255, 0, 0, 0.1);
+  outline: red solid 2px;
+  opacity: 0;
+  display: flex;
+  min-width: 25px;
+  min-height: 25px;
+  max-width: 25px;
+  max-height: 25px;
+  border-radius: 50%;
+  text-align: center;
+  align-content: center;
+  justify-content: center;
+  justify-items: center;
+  position: relative;
+  top: 5px;
+  right: 30px;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
+}
+
 .DayText {
   align-self: center;
   margin-bottom: 6px;
@@ -200,7 +227,7 @@ body {
   padding: 4px;
   margin: 4px 0;
   color: white;
-  position: absolute;
+  position: relative;
   min-width: 82px;
   max-width: 82px;
   overflow: hidden;
@@ -213,7 +240,6 @@ body {
   z-index: 5;
   backdrop-filter: blur(10px);
 }
-
 
 .NewWeeklyBody {
   background: var(--Dark-Grey);

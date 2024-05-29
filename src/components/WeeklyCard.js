@@ -46,6 +46,9 @@ function WeeklyCard({ fileData, range }) {
           ))}
         </div>
       ))}
+      <div className='DeleteButton'>
+        ×
+      </div>
     </div>
   );
 }
