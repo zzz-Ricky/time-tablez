@@ -3,7 +3,7 @@ import '../renderer/App.css';
 import SidebarCalendar from './SidebarCalendar';
 import Home from '../pages/Home';
 
-function Sidebar({ updateSelectedWeekRange, updateVisibleSchedules, visibleSchedules }) {
+function Sidebar({ updateSelectedWeekRange, updateVisibleSchedules, visibleSchedules, schedules }) {
   return (
     <div className="SideBarBody">
       <h1 id='Title'>TimeTablez</h1>
@@ -12,10 +12,10 @@ function Sidebar({ updateSelectedWeekRange, updateVisibleSchedules, visibleSched
       <h3>Import Comparison</h3>
       <p>Visible Schedules</p>
       <div className='VisibleSchedules'>
-      {visibleSchedules.map((schedule) => (
+      {schedules.map((schedule) => (
           <label className='ScheduleCheckbox' key={schedule}>
-            <input type='checkbox' />
-            {schedule}
+            <input type='checkbox' defaultChecked='true' onChange={(e) => updateVisibleSchedules(e, schedule)}/>
+            <input type='text' className='ScheduleName' placeholder='New Schedule'/>
           </label>
         ))}
       </div>

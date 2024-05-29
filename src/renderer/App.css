@@ -107,6 +107,19 @@ body {
   }
 }
 
+.ScheduleName {
+  color: var(--Semi-White);
+  font-weight: bold;
+  border-radius: var(--CornerSize);
+  border: none;
+  outline: none;
+  background-color: var(--Semi-Black);
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 100%;
+  overflow-y: hidden;
+}
+
 .VisibleSchedules {
   overflow-y: scroll;
   max-height: 30%;
@@ -239,6 +252,7 @@ body {
   min-height: 200px;
   z-index: 5;
   backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 
 .NewWeeklyBody {

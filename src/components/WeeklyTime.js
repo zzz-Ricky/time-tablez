@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 
-function WeeklyTime() {
-
-  const [timeFormat, setTimeFormat] = useState('12Hour'); // Default to 12-hour format
+function WeeklyTime({ timeFormat, handleChange}) {
 
   // 12-hour format
   const _12HourTime = [
@@ -15,10 +13,6 @@ function WeeklyTime() {
     '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
     '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
   ];
-
-  const handleChange = (event) => {
-    setTimeFormat(event.target.value);
-  };
 
   const selectedTimeArray = timeFormat === '12Hour' ? _12HourTime : _24HourTime;
 

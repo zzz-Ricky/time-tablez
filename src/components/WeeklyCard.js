@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { parseICS, getTimeZoneID, handleTimeZoneDTSTART, handleTimeZoneDTEND, parseICSToDate, parseICSToLength, parseICSToPosition, groupEventsByDay } from '../scripts/icsParser';
 
-function WeeklyCard({ fileData, range }) {
+function WeeklyCard({ fileData, range, timeFormat, deleteSchedule}) {
   const [eventsByDay, setEventsByDay] = useState({});
 
   useEffect(() => {
@@ -22,7 +22,9 @@ function WeeklyCard({ fileData, range }) {
   }, [fileData, range]);
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const test = 190
+
+  const timeOptions = timeFormat === '24Hour' ? { hour: '2-digit', minute: '2-digit', hour12: false } : { hour: '2-digit', minute: '2-digit', hour12: true };
+
 
   return (
     <div className="WeeklyBody">
@@ -34,11 +36,10 @@ function WeeklyCard({ fileData, range }) {
               top: !event[handleTimeZoneDTSTART(event)[0]] ? '60px' : `${parseICSToPosition(event[handleTimeZoneDTSTART(event)[0]])}px`,
               height: !event[handleTimeZoneDTSTART(event)[0]] ? '940px' : `${parseICSToLength(event[handleTimeZoneDTSTART(event)[0]], event[handleTimeZoneDTEND(event)[0]])}px`,
             }}>
-              {/* 12AM = top:60px, each subsequent hour is offset by 40px, hence the formula */}
               {/* Display event details */}
               <div>{event.SUMMARY}</div>
-              <div>Start: {event[handleTimeZoneDTSTART(event)[0]] && parseICSToDate(event[handleTimeZoneDTSTART(event)[0]]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-              <div>End: {event[handleTimeZoneDTEND(event)[0]] && parseICSToDate(event[handleTimeZoneDTEND(event)[0]]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+              <div>Start: {event[handleTimeZoneDTSTART(event)[0]] && parseICSToDate(event[handleTimeZoneDTSTART(event)[0]]).toLocaleTimeString([], timeOptions)}</div>
+              <div>End: {event[handleTimeZoneDTEND(event)[0]] && parseICSToDate(event[handleTimeZoneDTEND(event)[0]]).toLocaleTimeString([], timeOptions)}</div>
               <div>Location: {event.LOCATION}</div>
               <div>Description: {event.DESCRIPTION}</div>
               <div>Organizer: {event.ORGANIZER}</div>
@@ -46,7 +47,7 @@ function WeeklyCard({ fileData, range }) {
           ))}
         </div>
       ))}
-      <div className='DeleteButton'>
+      <div className='DeleteButton' onClick={(e) => deleteSchedule(e, fileData)}>
         ×
       </div>
     </div>

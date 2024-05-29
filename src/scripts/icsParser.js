@@ -87,8 +87,8 @@ export function parseICSToDate(dateTimeString) {
     const minute = dateTimeString.substr(11, 2);
     const second = dateTimeString.substr(13, 2);
     const overallTime = (Number(hour) + Number(minute/60) + Number(second/3600))/24;
-    const overallPosition = (overallTime*920)+60;
-    console.log("Overall time", overallTime)
+    const overallPosition = (overallTime*920)+20;
+    /* 12AM = top:20px, each subsequent hour is offset by 40px, hence the formula */
     return overallPosition;
   };
   export function parseICSToLength(InitialTime, EndTime) {
@@ -131,7 +131,6 @@ export function parseICSToDate(dateTimeString) {
 
         let recurrenceDays = [startDate.getDay()]; // Initial day
 
-        console.log('recurrenceDays', recurrenceDays)
         if (event.RRULE) {
           const recurrenceRules = event.RRULE.split(';');
           recurrenceRules.forEach(rule => {
