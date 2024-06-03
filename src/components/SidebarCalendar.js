@@ -47,18 +47,18 @@ function SidebarCalendar({ updateSelectedWeekRange }) {
     const calculateWeekRange = (week) => {
         if (week === null) return null;
 
-        const startOfWeek = (week * 7) + 1 - new Date(year, month - 1, 1).getDay();
+        const startOfWeek = (week * 7) - (new Date(year, month - 1, 1).getDay() || 7) + 2;
         const endOfWeek = startOfWeek + 6;
 
         const startDate = new Date(year, month - 1, startOfWeek);
-        const endDate = new Date(year, month - 1, Math.min(endOfWeek, daysInMonth(month, year)));
-
+        const endDate = new Date(year, month - 1, Math.min(endOfWeek, daysInMonth(month, year))+1);
         return { start: startDate, end: endDate };
     };
 
     const calculateCurrentWeek = () => {
         const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
-        const currentWeek = Math.floor((currentDay + firstDayOfMonth - 1) / 7);
+        const offset = (firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1); // adjust offset for Monday start
+        const currentWeek = Math.floor((currentDay + offset) / 7);
         return currentWeek;
     };
 
@@ -91,18 +91,18 @@ function SidebarCalendar({ updateSelectedWeekRange }) {
             <table cellSpacing="4" cellPadding="8" id='DateTable'>
                 <thead>
                     <tr>
-                        <th>S</th>
                         <th>M</th>
                         <th>T</th>
                         <th>W</th>
                         <th>T</th>
                         <th>F</th>
                         <th>S</th>
+                        <th>S</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {[...Array(Math.ceil((daysInMonth(month, year) + new Date(year, month - 1, 1).getDay()) / 7))].map((_, week) => (
+                    {[...Array(Math.ceil((daysInMonth(month, year) + (new Date(year, month - 1, 1).getDay() || 7) - 1) / 7))].map((_, week) => (
                         <tr
                             key={week}
                             id={selectedWeek === week ? 'SelectedWeek' : 'UnSelectedWeek'}
@@ -110,7 +110,7 @@ function SidebarCalendar({ updateSelectedWeekRange }) {
                             onClick={() => handleWeekClick(week)}
                         >
                             {[...Array(7)].map((_, day) => {
-                                const dayNumber = (week * 7) + day + 1 - new Date(year, month - 1, 1).getDay();
+                                const dayNumber = (week * 7) + day + 1 - (new Date(year, month - 1, 1).getDay() || 7) + 1;
                                 return (
                                     <td key={day} id='DateDay'>
                                         {dayNumber > 0 && dayNumber <= daysInMonth(month, year) ? dayNumber : ''}

@@ -6,17 +6,9 @@ function WeeklyCard({ fileData, range, timeFormat, deleteSchedule}) {
 
   useEffect(() => {
     if (fileData && range) {
-      const events = parseICS(fileData);
-      const filteredEvents = events.filter(event => {
-        const startDate = handleTimeZoneDTSTART(event);
-        let eventDate;
-          if(startDate){
-            eventDate = parseICSToDate(event[startDate[0]]); // Convert DTSTART to Date object
-            return eventDate >= new Date(range.start) && eventDate <= new Date(range.end);
-          }
-      });
-      const updatedEventsByDay = groupEventsByDay(filteredEvents);
-      console.log('eventsByDay', updatedEventsByDay)
+      const events = parseICS(fileData, 'events');
+      const updatedEventsByDay = groupEventsByDay(events, range);
+
       setEventsByDay(updatedEventsByDay);
     }
   }, [fileData, range]);
@@ -34,7 +26,7 @@ function WeeklyCard({ fileData, range, timeFormat, deleteSchedule}) {
           {eventsByDay[day] && eventsByDay[day].map((event, eventIndex) => (
             <div key={eventIndex} className='EventOverlay' style={{
               top: !event[handleTimeZoneDTSTART(event)[0]] ? '60px' : `${parseICSToPosition(event[handleTimeZoneDTSTART(event)[0]])}px`,
-              height: !event[handleTimeZoneDTSTART(event)[0]] ? '940px' : `${parseICSToLength(event[handleTimeZoneDTSTART(event)[0]], event[handleTimeZoneDTEND(event)[0]])}px`,
+              height: !event[handleTimeZoneDTSTART(event)[0]] ? '900px' : `${parseICSToLength(event[handleTimeZoneDTSTART(event)[0]], event[handleTimeZoneDTEND(event)[0]])}px`,
             }}>
               {/* Display event details */}
               <div>{event.SUMMARY}</div>

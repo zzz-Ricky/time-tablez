@@ -182,7 +182,7 @@ body {
   min-width: 630px;
   max-width: 630px;
   margin-right: 20px;
-  overflow: hidden;
+  position: relative;
 }
 
 .WeeklyBody:hover .DeleteButton,
@@ -240,13 +240,14 @@ body {
   padding: 4px;
   margin: 4px 0;
   color: white;
-  position: relative;
+  position: absolute;
   min-width: 82px;
   max-width: 82px;
   overflow: hidden;
 }
 
 .EventOverlay:hover {
+  position: absolute;
   overflow-wrap: break-word;
   min-width: 200px;
   min-height: 200px;
