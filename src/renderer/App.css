@@ -36,6 +36,18 @@ body {
 
 #Title {
   font-weight: bold;
+  font-size: 22px;
+}
+
+.SidebarText {
+  font-size: 16px;
+  color: gray;
+  margin: 10px;
+}
+
+.SidebarText:hover {
+  color: var(--Semi-White);
+  cursor: pointer;
 }
 
 #DeckName {
@@ -93,6 +105,28 @@ body {
   z-index: 1;
 }
 
+.ColorOverlayList {
+  min-height: 86px;
+  min-width: 100%;
+  max-width: 100%;
+  background-color: var(--Semi-Black);
+  padding-left: 12px;
+  border-radius: var(--CornerSize);
+}
+
+.ColorType {
+  display: flex;
+  flex-direction: column;
+  margin: 2px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.ColorType:hover {
+  color: gray;
+  cursor: pointer;
+}
+
 @media screen and (max-width: 1000px) {
   .SideBarBody {
     min-width: 250px;
@@ -121,7 +155,7 @@ body {
 }
 
 .VisibleSchedules {
-  overflow-y: scroll;
+  overflow-y: auto;
   max-height: 30%;
   min-height: 30%;
   min-width: 100%;
@@ -212,6 +246,11 @@ body {
   transition-timing-function: ease-in;
 }
 
+.DeleteButton:hover {
+  background-color: rgba(255, 0, 0, 1);
+  transition-duration: 0s;
+}
+
 .DayText {
   align-self: center;
   margin-bottom: 6px;
@@ -253,6 +292,7 @@ body {
   min-height: 200px;
   z-index: 5;
   backdrop-filter: blur(10px);
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 1);
   cursor: pointer;
 }
 

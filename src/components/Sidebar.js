@@ -10,8 +10,15 @@ function Sidebar({ updateSelectedWeekRange, updateVisibleSchedules, visibleSched
     <div className="SideBarBody">
       <h1 id='Title'>TimeTablez</h1>
       <textarea id='DeckName' type="text" placeholder='Card Deck Title'/>
-      <h3>Export Comparison</h3>
-      <h3>Import Comparison</h3>
+      <h3 className='SidebarText'>⇱ Export Comparison</h3>
+      <h3 className='SidebarText'>⇲ Import Comparison</h3>
+      <p>Colour Overlays</p>
+      <div className='ColorOverlayList'>
+        <p className='ColorType'>Free Time Overlap</p>
+        <p className='ColorType'>Time Conflicts</p>
+        <p className='ColorType'>Shared Free Time</p>
+        <p className='ColorType'>Unshared Free Time</p>
+      </div>
       <p>Visible Schedules</p>
       <div className='VisibleSchedules'>
       { schedules.map((schedule) => {

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { parseICS, getTimeZoneID, handleTimeZoneDTSTART, handleTimeZoneDTEND, parseICSToDate, parseICSToLength, parseICSToPosition, groupEventsByDay } from '../scripts/icsParser';
 
-function WeeklyCard({ fileData, range, timeFormat, deleteSchedule}) {
+function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, reportEvents, compareEvents}) {
   const [eventsByDay, setEventsByDay] = useState({});
 
   useEffect(() => {
     if (fileData && range) {
       const events = parseICS(fileData, 'events');
       const updatedEventsByDay = groupEventsByDay(events, range);
-
       setEventsByDay(updatedEventsByDay);
     }
+    reportEvents(keyProp, eventsByDay);
   }, [fileData, range]);
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
