@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { parseICS, getTimeZoneID, handleTimeZoneDTSTART, handleTimeZoneDTEND, parseICSToDate, parseICSToLength, parseICSToPosition, groupEventsByDay } from '../scripts/icsParser';
+import { parseDateToPosition, parseDateToLength } from '../scripts/eventCompare';
 
 function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, reportEvents, compareEvents}) {
   const [eventsByDay, setEventsByDay] = useState({});
+  const [conflictsByDay, setConflictByDay] = useState({});
 
   useEffect(() => {
     if (fileData && range) {
       const events = parseICS(fileData, 'events');
       const updatedEventsByDay = groupEventsByDay(events, range);
+      reportEvents(keyProp, eventsByDay);
+      setConflictByDay(compareEvents(keyProp));
       setEventsByDay(updatedEventsByDay);
     }
-    reportEvents(keyProp, eventsByDay);
+    // if (conflictsByDay[0]){
+    //   if (conflictsByDay[0].conflictTime[0]){
+    //     console.log("Test", "overlapStart", typeof conflictsByDay[0].conflictTime[0].overlapStart)
+    //   }
+    // }
   }, [fileData, range]);
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -37,6 +45,24 @@ function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, repo
               <div>Organizer: {event.ORGANIZER}</div>
             </div>
           ))}
+          {conflictsByDay[0] && conflictsByDay[0].conflictTime
+            .filter(conflict => conflict.day === day)
+            .map((conflict, conflictIndex) => (
+              <div key={conflictIndex} className='ConflictOverlay' style={{
+                top: `${parseDateToPosition(conflict.overlapStart)}px`,
+                height: `${parseDateToLength(conflict.overlapStart, conflict.overlapEnd)}px`,
+              }}>
+              </div>
+            ))}
+          {conflictsByDay[0] && conflictsByDay[0].commonFreeTime
+            .filter(FreeTime => FreeTime.day === day)
+            .map((FreeTime, FreeTimeIndex) => (
+              <div key={FreeTimeIndex} className='FreeTimeOverlay' style={{
+                top: `${parseDateToPosition(FreeTime.freeStart)}px`,
+                height: `${parseDateToLength(FreeTime.freeStart, FreeTime.freeEnd)}px`,
+              }}>
+              </div>
+            ))}
         </div>
       ))}
       <div className='DeleteButton' onClick={(e) => deleteSchedule(e, fileData)}>
@@ -44,6 +70,8 @@ function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, repo
       </div>
     </div>
   );
+
+
 }
 
 export default WeeklyCard;

@@ -54,16 +54,14 @@ function Home() {
     setEventsData(prev => ({ ...prev, [key]: eventsByDay }));
   };
 
-  const compareEvents = () => {
+  function compareEvents(key){
     const schedules = Object.values(eventsData);
-    let comparisonData;
+    var comparisonData =[];
     if (schedules.length > 1) {
-      for (const scheduleA of schedules){
         for (const scheduleB of schedules){
-          if (scheduleA !== scheduleB) { // Skip the comparison with itself
-            comparisonData = findCommonTimes(scheduleA, scheduleB);
+          if (eventsData[key] !== scheduleB) { // Skip the comparison with itself
+            comparisonData.push(findCommonTimes(eventsData[key], scheduleB));
             }
-          }
         }
       }
     return comparisonData

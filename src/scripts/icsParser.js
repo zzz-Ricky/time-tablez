@@ -123,9 +123,6 @@ export function parseICSToDate(dateTimeString) {
     else{
       return 980;
     }
-
-    const overallPosition = (overallTime*920)+60;
-    return overallPosition;
   };
 
 
