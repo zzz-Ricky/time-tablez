@@ -51,19 +51,15 @@ function Home() {
   const [eventsData, setEventsData] = useState({});
 
   const handleEventsReport = (key, eventsByDay) => {
-    setEventsData(prev => {
-      const updatedData = { ...prev, [key]: eventsByDay };
-      compareEvents(updatedData);
-
-      return updatedData;
-    });
+    setEventsData(prev => ({ ...prev, [key]: eventsByDay }));
   };
 
-  function compareEvents(eventsData) {
+  function compareEvents() {
     const schedules = Object.values(eventsData);
     var comparisonData;
     if (schedules.length > 1) {
       comparisonData = findCommonTimes(schedules);
+
     }
     return comparisonData;
   };
@@ -76,7 +72,7 @@ function Home() {
       <div className="AppContent">
         <WeeklyTime timeFormat={timeFormat} handleChange={handleFormatChange}/>
         {visibleSchedules.map((fileData, index) => (
-          <WeeklyCard key={index} keyProp={index} fileData={fileData} range={selectedWeekRange} timeFormat={timeFormat} deleteSchedule={deleteSchedule} reportEvents={handleEventsReport}/>
+          <WeeklyCard key={index} keyProp={index} fileData={fileData} range={selectedWeekRange} timeFormat={timeFormat} deleteSchedule={deleteSchedule} reportEvents={handleEventsReport} compareEvents={compareEvents}/>
         ))}
         <NewWeeklyCard onFileRead={handleFileData}/>
       </div>

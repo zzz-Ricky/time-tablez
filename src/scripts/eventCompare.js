@@ -30,8 +30,8 @@ for (const Schedule of Schedules){
     }
   }
 }
-
-  return calculateTimeOverlap(occupiedTimes);
+  const timeProfile = calculateTimeOverlap(occupiedTimes);
+  return timeProfile
 }
 
 function calculateTimeOverlap(occupiedTimes) {

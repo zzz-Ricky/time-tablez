@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { parseICS, getTimeZoneID, handleTimeZoneDTSTART, handleTimeZoneDTEND, parseICSToDate, parseICSToLength, parseICSToPosition, groupEventsByDay } from '../scripts/icsParser';
 import { parseDateToPosition, parseDateToLength } from '../scripts/eventCompare';
 
-function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, reportEvents}) {
+function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, reportEvents, compareEvents}) {
   const [eventsByDay, setEventsByDay] = useState({});
   const [conflictsByDay, setConflictByDay] = useState({});
 
@@ -11,7 +11,8 @@ function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, repo
       const events = parseICS(fileData, 'events');
       const updatedEventsByDay = groupEventsByDay(events, range);
       setEventsByDay(updatedEventsByDay);
-      setConflictByDay(reportEvents(keyProp, updatedEventsByDay));
+      reportEvents(keyProp, updatedEventsByDay)
+      setConflictByDay(compareEvents());
       console.log("conflictsByDay", conflictsByDay)
     }
     // if (conflictsByDay[0]){

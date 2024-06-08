@@ -103,7 +103,7 @@ export function parseICSToDate(dateTimeString) {
     /* 12AM = top:20px, each subsequent hour is offset by 40px, hence the formula */
     return overallPosition;
   };
-  export function parseICSToLength(InitialTime, EndTime) {d
+  export function parseICSToLength(InitialTime, EndTime) {
     // Initial Time
     const initHour = InitialTime.substr(9, 2);
     const initMinute = InitialTime.substr(11, 2);
