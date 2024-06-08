@@ -51,21 +51,23 @@ function Home() {
   const [eventsData, setEventsData] = useState({});
 
   const handleEventsReport = (key, eventsByDay) => {
-    setEventsData(prev => ({ ...prev, [key]: eventsByDay }));
+    setEventsData(prev => {
+      const updatedData = { ...prev, [key]: eventsByDay };
+      compareEvents(updatedData);
+
+      return updatedData;
+    });
   };
 
-  function compareEvents(key){
+  function compareEvents(eventsData) {
     const schedules = Object.values(eventsData);
-    var comparisonData =[];
+    var comparisonData;
     if (schedules.length > 1) {
-        for (const scheduleB of schedules){
-          if (eventsData[key] !== scheduleB) { // Skip the comparison with itself
-            comparisonData.push(findCommonTimes(eventsData[key], scheduleB));
-            }
-        }
-      }
-    return comparisonData
+      comparisonData = findCommonTimes(schedules);
+    }
+    return comparisonData;
   };
+
 
 
   return (
@@ -74,7 +76,7 @@ function Home() {
       <div className="AppContent">
         <WeeklyTime timeFormat={timeFormat} handleChange={handleFormatChange}/>
         {visibleSchedules.map((fileData, index) => (
-          <WeeklyCard key={index} keyProp={index} fileData={fileData} range={selectedWeekRange} timeFormat={timeFormat} deleteSchedule={deleteSchedule} reportEvents={handleEventsReport} compareEvents={compareEvents}/>
+          <WeeklyCard key={index} keyProp={index} fileData={fileData} range={selectedWeekRange} timeFormat={timeFormat} deleteSchedule={deleteSchedule} reportEvents={handleEventsReport}/>
         ))}
         <NewWeeklyCard onFileRead={handleFileData}/>
       </div>

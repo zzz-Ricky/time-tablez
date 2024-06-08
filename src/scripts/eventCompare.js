@@ -1,171 +1,138 @@
 import { handleTimeZoneDTSTART, handleTimeZoneDTEND, parseICSToDate } from "./icsParser";
 
-export function findCommonTimes(ScheduleA, ScheduleB) {
-  let occupiedTimeA = {};
-  let occupiedTimeB = {};
-
-  // Parse ScheduleA
-  for (const DayA in ScheduleA) {
-    if (!occupiedTimeA[DayA]) {
-      occupiedTimeA[DayA] = [];
+export function findCommonTimes(Schedules) {
+    var occupiedTimes = {
+    "Monday": [],
+    "Tuesday": [],
+    "Wednesday": [],
+    "Thursday": [],
+    "Friday": [],
+    "Saturday": [],
+    "Sunday": []
+  };
+  // Parse all Schedules
+for (const Schedule of Schedules){
+  for (const Day in Schedule) {
+    if (!occupiedTimes[Day]) {
+      occupiedTimes[Day] = [];
     }
-    for (const eventA of ScheduleA[DayA]) {
-      const eventSummaryA = eventA['SUMMARY'];
-      const DTSTARTA = handleTimeZoneDTSTART(eventA);
-      const eventAStartDate = parseICSToDate(eventA[DTSTARTA]);
-      const DTENDA = handleTimeZoneDTEND(eventA);
-      const eventAEndDate = parseICSToDate(eventA[DTENDA]);
-      occupiedTimeA[DayA].push({
-        summary: eventSummaryA,
-        startDate: eventAStartDate,
-        endDate: eventAEndDate,
+    for (const event of Schedule[Day]) {
+      const eventSummary = event['SUMMARY'];
+      const DTSTART = handleTimeZoneDTSTART(event);
+      const eventStartDate = parseICSToDate(event[DTSTART]);
+      const DTEND = handleTimeZoneDTEND(event);
+      const eventEndDate = parseICSToDate(event[DTEND]);
+      occupiedTimes[Day].push({
+        summary: eventSummary,
+        startDate: eventStartDate,
+        endDate: eventEndDate,
       });
     }
   }
-
-  // Parse ScheduleB
-  for (const DayB in ScheduleB) {
-    if (!occupiedTimeB[DayB]) {
-      occupiedTimeB[DayB] = [];
-    }
-    for (const eventB of ScheduleB[DayB]) {
-      const eventSummaryB = eventB['SUMMARY'];
-      const DTSTARTB = handleTimeZoneDTSTART(eventB);
-      const eventBStartDate = parseICSToDate(eventB[DTSTARTB]);
-      const DTENDB = handleTimeZoneDTEND(eventB);
-      const eventBEndDate = parseICSToDate(eventB[DTENDB]);
-      occupiedTimeB[DayB].push({
-        summary: eventSummaryB,
-        startDate: eventBStartDate,
-        endDate: eventBEndDate,
-      });
-    }
-  }
-
-  return calculateTimeOverlap(occupiedTimeA, occupiedTimeB);
 }
 
-function calculateTimeOverlap(occupiedTimeA, occupiedTimeB) {
+  return calculateTimeOverlap(occupiedTimes);
+}
+
+function calculateTimeOverlap(occupiedTimes) {
   let commonFreeTime = [];
   let conflictTime = [];
-  let eventOverlap = [];
 
-  for (const day in occupiedTimeA) {
-    if (occupiedTimeB.hasOwnProperty(day)) {
-      const eventsA = occupiedTimeA[day];
-      const eventsB = occupiedTimeB[day];
+  // Get the current week's start and end dates
+  const { startOfWeek, endOfWeek } = getCurrentWeekDates();
 
-      // Combine and sort all events for the day
-      let allEvents = [...eventsA, ...eventsB].map(event => ({
-        summary: event.summary,
-        startDate: new Date(event.startDate),
-        endDate: new Date(event.endDate)
-      }));
-      allEvents.sort((a, b) => a.startDate - b.startDate);
+  for (const day in occupiedTimes) {
+    let events = occupiedTimes[day];
 
-      // Check for conflicts and overlaps
-      for (let i = 0; i < allEvents.length; i++) {
-        for (let j = i + 1; j < allEvents.length; j++) {
-          const eventA = allEvents[i];
-          const eventB = allEvents[j];
-          const { summary: summaryA, startDate: startA, endDate: endA } = eventA;
-          const { summary: summaryB, startDate: startB, endDate: endB } = eventB;
+    if (events.length === 0) {
+      // If there are no events for this day, consider the entire day as common free time
+      const fullDay = getFullDay(day, startOfWeek, endOfWeek);
+      commonFreeTime.push(fullDay);
+      continue; // Skip further processing for this day
+    }
 
-          // Check for overlap
-          if ((startA < endB && endA > startB)) {
-            const overlapStart = new Date(Math.max(startA.getTime(), startB.getTime()));
-            const overlapEnd = new Date(Math.min(endA.getTime(), endB.getTime()));
-            conflictTime.push({ day, overlapStart, overlapEnd });
+    // Sort events by start time
+    events.sort((a, b) => a.startDate - b.startDate);
 
-            // Check for same event summary
-            if (summaryA === summaryB) {
-              eventOverlap.push({ day, summary: summaryA, overlapStart, overlapEnd });
-            }
-          }
-        }
+    let mergedEvents = [];
+    let currentEvent = events[0];
+
+    // Merge overlapping events
+    for (let i = 1; i < events.length; i++) {
+      let nextEvent = events[i];
+
+      if (nextEvent.startDate <= currentEvent.endDate) {
+        // Events overlap, merge them
+        currentEvent.endDate = new Date(Math.max(currentEvent.endDate, nextEvent.endDate));
+      } else {
+        // Events don't overlap, push current event and update current event
+        mergedEvents.push(currentEvent);
+        currentEvent = nextEvent;
       }
+    }
 
-      // Calculate common free time
-      let dayStart = new Date(eventsA[0].startDate);
-      dayStart.setHours(0, 0, 0, 0);
-      let dayEnd = new Date(eventsA[0].startDate);
-      dayEnd.setHours(23, 59, 59, 999);
+    // Push the last event
+    mergedEvents.push(currentEvent);
 
-      let lastEnd = dayStart;
-      let potentialFreeTimes = [];
+    // Calculate common free time and conflict time
+    for (let i = 1; i < mergedEvents.length; i++) {
+      const gapStart = mergedEvents[i - 1].endDate;
+      const gapEnd = mergedEvents[i].startDate;
 
-      for (const event of allEvents) {
-        const { startDate: busyStart, endDate: busyEnd } = event;
-        if (lastEnd < busyStart) {
-          potentialFreeTimes.push({ freeStart: lastEnd, freeEnd: busyStart });
-        }
-        lastEnd = new Date(Math.max(lastEnd.getTime(), busyEnd.getTime()));
+      if (gapStart < gapEnd) {
+        // There is a gap between events, it's common free time
+        commonFreeTime.push({ startDate: gapStart, endDate: gapEnd, day: day});
       }
-      if (lastEnd < dayEnd) {
-        potentialFreeTimes.push({ freeStart: lastEnd, freeEnd: dayEnd });
-      }
+    }
 
-      // Merge overlapping free times
-      if (potentialFreeTimes.length > 0) {
-        let mergedFreeTimes = [];
-        let currentFreeTime = potentialFreeTimes[0];
-
-        for (let i = 1; i < potentialFreeTimes.length; i++) {
-          const nextFreeTime = potentialFreeTimes[i];
-          if (currentFreeTime.freeEnd >= nextFreeTime.freeStart) {
-            currentFreeTime.freeEnd = new Date(Math.max(currentFreeTime.freeEnd.getTime(), nextFreeTime.freeEnd.getTime()));
-          } else {
-            mergedFreeTimes.push(currentFreeTime);
-            currentFreeTime = nextFreeTime;
-          }
-        }
-        mergedFreeTimes.push(currentFreeTime);
-
-        // Ensure free times do not overlap with conflict times
-        for (const freeTime of mergedFreeTimes) {
-          let freeStart = freeTime.freeStart;
-          let freeEnd = freeTime.freeEnd;
-
-          for (const conflict of conflictTime) {
-            if (conflict.day === day) {
-              const { overlapStart, overlapEnd } = conflict;
-              if (freeStart < overlapEnd && freeEnd > overlapStart) {
-                if (freeStart < overlapStart) {
-                  commonFreeTime.push({ day, freeStart, freeEnd: overlapStart });
-                }
-                if (freeEnd > overlapEnd) {
-                  freeStart = overlapEnd;
-                } else {
-                  freeStart = null;
-                  break;
-                }
-              }
-            }
-          }
-          if (freeStart) {
-            commonFreeTime.push({ day, freeStart, freeEnd });
-          }
-        }
-      }
+    // If there are any events, the entire day is conflict time
+    if (mergedEvents.length > 0) {
+      conflictTime.push({ startDate: mergedEvents[0].startDate, endDate: mergedEvents[mergedEvents.length - 1].endDate, day: day });
     }
   }
 
-  let timeProfile = { commonFreeTime, conflictTime, eventOverlap };
+  let timeProfile = { commonFreeTime, conflictTime };
   return timeProfile;
 }
 
+// Function to get the current week's start and end dates
+function getCurrentWeekDates() {
+  const currentDate = new Date();
+  const currentDayOfWeek = currentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(startOfWeek.getDate() - currentDayOfWeek); // Set to the first day (Sunday) of the current week
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const endOfWeek = new Date(currentDate);
+  endOfWeek.setDate(endOfWeek.getDate() + (6 - currentDayOfWeek)); // Set to the last day (Saturday) of the current week
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  return { startOfWeek, endOfWeek };
+}
+
+// Function to get the full day interval
+function getFullDay(day, startOfWeek, endOfWeek) {
+
+  const dayDiff = { 'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6 };
+  const startOfDay = new Date(startOfWeek);
+  startOfDay.setDate(startOfWeek.getDate() + parseInt(dayDiff[day])); // Adjust to the specific day of the week
+  startOfDay.setHours(0, 0, 0, 0); // Set to the start of the day
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setHours(23, 59, 59, 999); // Set to the end of the day
 
 
-  export function parseDateToPosition(dateTimeObject) {
-    const hour = dateTimeObject.getHours();
-    const minute = dateTimeObject.getMinutes();
-    const second = dateTimeObject.getSeconds();
-    const overallTime = (Number(hour) + Number(minute/60) + Number(second/3600))/24;
-    const overallPosition = (overallTime*920)+45;
-    /* 12AM = top:20px, each subsequent hour is offset by 45px, hence the formula */
-    console.log("NOTERROR POSITION", dateTimeObject, overallPosition)
-    return overallPosition;
-  };
+  return { startDate: startOfDay, endDate: endOfDay, day: day };
+}
+
+export function parseDateToPosition(dateTimeObject) {
+  const hour = dateTimeObject.getHours();
+  const minute = dateTimeObject.getMinutes();
+  const second = dateTimeObject.getSeconds();
+  const overallTime = (Number(hour) + Number(minute/60) + Number(second/3600))/24;
+  const overallPosition = (overallTime*920)+45;
+  /* 12AM = top:20px, each subsequent hour is offset by 45px, hence the formula */
+  return overallPosition;
+};
 
   export function parseDateToLength(InitialTime, EndTime) {
     // Initial Time
@@ -180,13 +147,11 @@ function calculateTimeOverlap(occupiedTimeA, occupiedTimeB) {
     const endTimeSum = (Number(endHour) + Number(endMinute/60) + Number(endSecond/3600))/24;
     // Calculate difference to find height
     const overallTime = endTimeSum-initTimeSum;
-    if (overallTime > 0){
+    if (overallTime > 0 && overallTime){
       const overallHeight = (overallTime*920);;
-      console.log("NOTERROR LENGTH", InitialTime, EndTime, overallHeight)
       return overallHeight;
     }
     else{
-      return 980;
-      console.log("ERROR", InitialTime, EndTime)
+      return 900;
     }
   };
