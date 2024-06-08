@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { parseICS, getTimeZoneID, handleTimeZoneDTSTART, handleTimeZoneDTEND, parseICSToDate, parseICSToLength, parseICSToPosition, groupEventsByDay } from '../scripts/icsParser';
 import { parseDateToPosition, parseDateToLength } from '../scripts/eventCompare';
 
-function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, reportEvents, compareEvents}) {
+function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, reportEvents, compareEvents, fullComparison}) {
   const [eventsByDay, setEventsByDay] = useState({});
   const [conflictsByDay, setConflictByDay] = useState({});
 
@@ -12,15 +12,24 @@ function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, repo
       const updatedEventsByDay = groupEventsByDay(events, range);
       setEventsByDay(updatedEventsByDay);
       reportEvents(keyProp, updatedEventsByDay)
-      setConflictByDay(compareEvents());
-      console.log("conflictsByDay", conflictsByDay)
     }
     // if (conflictsByDay[0]){
     //   if (conflictsByDay[0].conflictTime[0]){
     //     console.log("Test", "overlapStart", typeof conflictsByDay[0].conflictTime[0].overlapStart)
     //   }
     // }
-  }, [fileData, range]);
+  }, [fullComparison]);
+
+  useEffect(() => {
+    if (fileData && range) {
+      setConflictByDay(compareEvents(eventsByDay));
+    }
+    // if (conflictsByDay[0]){
+    //   if (conflictsByDay[0].conflictTime[0]){
+    //     console.log("Test", "overlapStart", typeof conflictsByDay[0].conflictTime[0].overlapStart)
+    //   }
+    // }
+  }, [fullComparison]);
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -46,24 +55,29 @@ function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, repo
               <div>Organizer: {event.ORGANIZER}</div>
             </div>
           ))}
-          {/* {conflictsByDay && conflictsByDay.conflictTime
-            .filter(conflict => conflict.day === day)
-            .map((conflict, conflictIndex) => (
-              <div key={conflictIndex} className='ConflictOverlay' style={{
-                top: `${parseDateToPosition(conflict.startDate)}px`,
-                height: `${parseDateToLength(conflict.startDate, conflict.endDate)}px`,
-              }}>
-              </div>
-            ))}
-          {conflictsByDay && conflictsByDay.commonFreeTime
-            .filter(FreeTime => FreeTime.day === day)
-            .map((FreeTime, FreeTimeIndex) => (
-              <div key={FreeTimeIndex} className='FreeTimeOverlay' style={{
-                top: `${parseDateToPosition(FreeTime.startDate)}px`,
-                height: `${parseDateToLength(FreeTime.startDate, FreeTime.endDate)}px`,
-              }}>
-              </div>
-            ))} */}
+{conflictsByDay && conflictsByDay.conflictTime &&
+  conflictsByDay.conflictTime
+    .filter(conflict => conflict.day === day)
+    .map((conflict, conflictIndex) => (
+      <div key={conflictIndex} className='ConflictOverlay' style={{
+        top: `${parseDateToPosition(conflict.startDate)}px`,
+        height: `${parseDateToLength(conflict.startDate, conflict.endDate)}px`,
+      }}>
+      </div>
+    ))
+}
+
+{conflictsByDay && conflictsByDay.commonFreeTime &&
+  conflictsByDay.commonFreeTime
+    .filter(FreeTime => FreeTime.day === day)
+    .map((FreeTime, FreeTimeIndex) => (
+      <div key={FreeTimeIndex} className='FreeTimeOverlay' style={{
+        top: `${parseDateToPosition(FreeTime.startDate)}px`,
+        height: `${parseDateToLength(FreeTime.startDate, FreeTime.endDate)}px`,
+      }}>
+      </div>
+    ))
+}
         </div>
       ))}
       <div className='DeleteButton' onClick={(e) => deleteSchedule(e, fileData)}>

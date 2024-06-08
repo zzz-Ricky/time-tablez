@@ -72,7 +72,7 @@ function Home() {
       <div className="AppContent">
         <WeeklyTime timeFormat={timeFormat} handleChange={handleFormatChange}/>
         {visibleSchedules.map((fileData, index) => (
-          <WeeklyCard key={index} keyProp={index} fileData={fileData} range={selectedWeekRange} timeFormat={timeFormat} deleteSchedule={deleteSchedule} reportEvents={handleEventsReport} compareEvents={compareEvents}/>
+          <WeeklyCard key={index} keyProp={index} fileData={fileData} range={selectedWeekRange} timeFormat={timeFormat} deleteSchedule={deleteSchedule} reportEvents={handleEventsReport} compareEvents={compareEvents} fullComparison={eventsData}/>
         ))}
         <NewWeeklyCard onFileRead={handleFileData}/>
       </div>
