@@ -30,6 +30,7 @@ for (const Schedule of Schedules){
     }
   }
 }
+
   const timeProfile = calculateTimeOverlap(occupiedTimes);
   return timeProfile
 }
@@ -44,50 +45,35 @@ function calculateTimeOverlap(occupiedTimes) {
   for (const day in occupiedTimes) {
     let events = occupiedTimes[day];
 
-    if (events.length === 0) {
-      // If there are no events for this day, consider the entire day as common free time
-      const fullDay = getFullDay(day, startOfWeek, endOfWeek);
-      commonFreeTime.push(fullDay);
-      continue; // Skip further processing for this day
-    }
-
     // Sort events by start time
-    events.sort((a, b) => a.startDate - b.startDate);
+    let sortedEvents = events.sort((a, b) => (a.startDate.getHours() + ((a.startDate.getMinutes())/60) + ((a.startDate.getSeconds())/3600)) - (b.startDate.getHours() + ((b.startDate.getMinutes())/60) + ((b.startDate.getSeconds())/3600)));
 
-    let mergedEvents = [];
-    let currentEvent = events[0];
+    let currentDayStart = getFullDayStart(day, startOfWeek);
+    let currentDayEnd = getFullDayEnd(day, startOfWeek);
 
-    // Merge overlapping events
-    for (let i = 1; i < events.length; i++) {
-      let nextEvent = events[i];
-
-      if (nextEvent.startDate <= currentEvent.endDate) {
-        // Events overlap, merge them
-        currentEvent.endDate = new Date(Math.max(currentEvent.endDate, nextEvent.endDate));
-      } else {
-        // Events don't overlap, push current event and update current event
-        mergedEvents.push(currentEvent);
-        currentEvent = nextEvent;
+    //Last end time refers to the last time an event ended. By default, this is the beginning of the day.
+    let lastEndTime = currentDayStart;
+    // Process events to determine free and conflict times
+    for (let event of sortedEvents) {
+      let calculatedEventStartTime = (event.startDate.getHours() + ((event.startDate.getMinutes())/60) + ((event.startDate.getSeconds())/3600));
+      let calculatedLastEndTime = (lastEndTime.getHours() + ((lastEndTime.getMinutes())/60) + ((lastEndTime.getSeconds())/3600))
+      if (calculatedEventStartTime > calculatedLastEndTime) {
+        commonFreeTime.push({ startDate: lastEndTime, endDate: event.startDate, day: day });
+        lastEndTime = event.endDate
       }
+      else{
+        if (day === 'Thursday'){
+          console.log(event.summary, event.startDate, lastEndTime)
+        }
+      }
+      // Mark the event duration as conflict time
+      conflictTime.push({ startDate: event.startDate, endDate: event.endDate, day: day });
+      lastEndTime = new Date(Math.max(lastEndTime, event.endDate));
     }
 
-    // Push the last event
-    mergedEvents.push(currentEvent);
-
-    // Calculate common free time and conflict time
-    for (let i = 1; i < mergedEvents.length; i++) {
-      const gapStart = mergedEvents[i - 1].endDate;
-      const gapEnd = mergedEvents[i].startDate;
-
-      if (gapStart < gapEnd) {
-        // There is a gap between events, it's common free time
-        commonFreeTime.push({ startDate: gapStart, endDate: gapEnd, day: day});
-      }
-    }
-
-    // If there are any events, the entire day is conflict time
-    if (mergedEvents.length > 0) {
-      conflictTime.push({ startDate: mergedEvents[0].startDate, endDate: mergedEvents[mergedEvents.length - 1].endDate, day: day });
+    // After processing all events, check if there's any free time left until the end of the day
+    if (1) {
+      commonFreeTime.push({ startDate: lastEndTime, endDate: currentDayEnd, day: day });
     }
   }
 
@@ -110,18 +96,21 @@ function getCurrentWeekDates() {
   return { startOfWeek, endOfWeek };
 }
 
-// Function to get the full day interval
-function getFullDay(day, startOfWeek, endOfWeek) {
-
+// Function to get the start of the full day interval
+function getFullDayStart(day, startOfWeek) {
   const dayDiff = { 'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6 };
   const startOfDay = new Date(startOfWeek);
-  startOfDay.setDate(startOfWeek.getDate() + parseInt(dayDiff[day])); // Adjust to the specific day of the week
+  startOfDay.setDate(startOfWeek.getDate() + dayDiff[day]); // Adjust to the specific day of the week
   startOfDay.setHours(0, 0, 0, 0); // Set to the start of the day
+  return startOfDay;
+}
+
+// Function to get the end of the full day interval
+function getFullDayEnd(day, startOfWeek) {
+  const startOfDay = getFullDayStart(day, startOfWeek);
   const endOfDay = new Date(startOfDay);
   endOfDay.setHours(23, 59, 59, 999); // Set to the end of the day
-
-
-  return { startDate: startOfDay, endDate: endOfDay, day: day };
+  return endOfDay;
 }
 
 export function parseDateToPosition(dateTimeObject) {

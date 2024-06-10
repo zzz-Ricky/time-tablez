@@ -13,22 +13,12 @@ function WeeklyCard({ keyProp, fileData, range, timeFormat, deleteSchedule, repo
       setEventsByDay(updatedEventsByDay);
       reportEvents(keyProp, updatedEventsByDay)
     }
-    // if (conflictsByDay[0]){
-    //   if (conflictsByDay[0].conflictTime[0]){
-    //     console.log("Test", "overlapStart", typeof conflictsByDay[0].conflictTime[0].overlapStart)
-    //   }
-    // }
-  }, [fullComparison]);
+  }, [fileData,range]);
 
   useEffect(() => {
     if (fileData && range) {
       setConflictByDay(compareEvents(eventsByDay));
     }
-    // if (conflictsByDay[0]){
-    //   if (conflictsByDay[0].conflictTime[0]){
-    //     console.log("Test", "overlapStart", typeof conflictsByDay[0].conflictTime[0].overlapStart)
-    //   }
-    // }
   }, [fullComparison]);
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
