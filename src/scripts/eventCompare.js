@@ -61,11 +61,6 @@ function calculateTimeOverlap(occupiedTimes) {
         commonFreeTime.push({ startDate: lastEndTime, endDate: event.startDate, day: day });
         lastEndTime = event.endDate
       }
-      else{
-        if (day === 'Thursday'){
-          console.log(event.summary, event.startDate, lastEndTime)
-        }
-      }
       // Mark the event duration as conflict time
       conflictTime.push({ startDate: event.startDate, endDate: event.endDate, day: day });
       lastEndTime = new Date(Math.max(lastEndTime, event.endDate));

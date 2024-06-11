@@ -64,15 +64,54 @@ function Home() {
     return comparisonData;
   };
 
+  const [FreeTimeVisibility, setFreeTimeVisibility] = useState(true);
 
+  const updateFreeTimeVisibility = (state) => {
+    setFreeTimeVisibility(!FreeTimeVisibility);
+  };
+
+  const [ConflictVisibility, setConflictVisibility] = useState(true);
+
+  const updateConflictVisibility = (state) => {
+    setConflictVisibility(!ConflictVisibility);
+  };
+
+  const [EventDetailVisibility, setEventDetailVisibility] = useState(true);
+
+  const updateEventDetailVisibility = (state) => {
+    setEventDetailVisibility(!EventDetailVisibility);
+  };
 
   return (
     <div className="AppBody">
-      <Sidebar updateSelectedWeekRange={updateSelectedWeekRange} updateVisibleSchedules={updateVisibleSchedules} visibleSchedules={visibleSchedules} schedules={fileDataList}/>
+      <Sidebar
+        updateSelectedWeekRange={updateSelectedWeekRange}
+        updateVisibleSchedules={updateVisibleSchedules}
+        visibleSchedules={visibleSchedules}
+        schedules={fileDataList}
+        setFreeTimeVisibility={updateFreeTimeVisibility}
+        setConflictVisibility={updateConflictVisibility}
+        setEventDetailVisibility={updateEventDetailVisibility}
+        FreeTimeVisibility={FreeTimeVisibility}
+        ConflictVisibility={ConflictVisibility}
+        EventDetailVisibility={EventDetailVisibility}
+        />
       <div className="AppContent">
         <WeeklyTime timeFormat={timeFormat} handleChange={handleFormatChange}/>
         {visibleSchedules.map((fileData, index) => (
-          <WeeklyCard key={index} keyProp={index} fileData={fileData} range={selectedWeekRange} timeFormat={timeFormat} deleteSchedule={deleteSchedule} reportEvents={handleEventsReport} compareEvents={compareEvents} fullComparison={eventsData}/>
+          <WeeklyCard
+            key={index}
+            keyProp={index}
+            fileData={fileData}
+            range={selectedWeekRange}
+            timeFormat={timeFormat}
+            deleteSchedule={deleteSchedule}
+            reportEvents={handleEventsReport}
+            compareEvents={compareEvents}
+            fullComparison={eventsData}
+            FreeTimeVisibility={FreeTimeVisibility}
+            ConflictVisibility={ConflictVisibility}
+            EventDetailVisibility={EventDetailVisibility}/>
         ))}
         <NewWeeklyCard onFileRead={handleFileData}/>
       </div>

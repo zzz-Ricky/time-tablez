@@ -123,8 +123,19 @@ body {
 }
 
 .ColorType:hover {
-  color: gray;
   cursor: pointer;
+}
+
+.SelectedColorType:hover {
+  color: gray;
+}
+
+.UnSelectedColorType {
+  color: gray;
+}
+
+.UnSelectedColorType:hover {
+  color: var(--Semi-White);
 }
 
 @media screen and (max-width: 1000px) {
@@ -156,8 +167,8 @@ body {
 
 .VisibleSchedules {
   overflow-y: auto;
-  max-height: 30%;
-  min-height: 30%;
+  max-height: 25%;
+  min-height: 25%;
   min-width: 100%;
   max-width: 100%;
   background-color: var(--Semi-Black);
