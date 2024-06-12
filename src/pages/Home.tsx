@@ -16,6 +16,11 @@ function Home() {
     setVisibleSchedules(prevData => [...prevData, data]);
   };
 
+  const importFileData = (data) => {
+    setFileDataList(data);
+    setVisibleSchedules(data);
+  }
+
   const deleteSchedule = (event, schedule) => {
     setFileDataList(visibleSchedules.filter(s => s !== schedule));
     setVisibleSchedules(visibleSchedules.filter(s => s !== schedule));
@@ -89,6 +94,7 @@ function Home() {
         updateVisibleSchedules={updateVisibleSchedules}
         visibleSchedules={visibleSchedules}
         schedules={fileDataList}
+        importSchedules={importFileData}
         setFreeTimeVisibility={updateFreeTimeVisibility}
         setConflictVisibility={updateConflictVisibility}
         setEventDetailVisibility={updateEventDetailVisibility}

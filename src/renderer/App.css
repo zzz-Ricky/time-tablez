@@ -144,7 +144,6 @@ body {
 @media screen and (max-width: 1000px) {
   .SideBarBody {
     min-width: 250px;
-    height: 150%;
   }
 
   .SideBarCal {
@@ -159,6 +158,10 @@ body {
 @media screen and (max-height: 1000px) {
   .AppContent {
     overflow: scroll;
+    height: 150%;
+  }
+
+  .SideBarBody {
     height: 150%;
   }
 }
@@ -333,9 +336,8 @@ body {
 }
 
 .ConflictOverlay {
-  border-radius: 8px;
+  border-radius: 4px;
   background-color: rgba(255, 0, 0, 0.1);
-  outline: rgba(255, 0, 0, 0.2) solid 2px;
   opacity: 0.8;
   background-size: 10px 10px;
   background-image: repeating-linear-gradient(45deg, rgba(255, 0, 0, 0.2) 0, rgba(255, 0, 0, 0.2) 1px, rgba(255, 0, 0, 0.1) 0, rgba(255, 0, 0, 0.1) 50%);
@@ -350,7 +352,7 @@ body {
 
 .FreeTimeOverlay {
   background-color: rgba(0, 255, 0, 0.1);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 4px;
   margin: 4px 0;
   color: white;

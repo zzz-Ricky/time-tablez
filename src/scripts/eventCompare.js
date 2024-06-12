@@ -113,7 +113,7 @@ export function parseDateToPosition(dateTimeObject) {
   const minute = dateTimeObject.getMinutes();
   const second = dateTimeObject.getSeconds();
   const overallTime = (Number(hour) + Number(minute/60) + Number(second/3600))/24;
-  const overallPosition = (overallTime*920)+20;
+  const overallPosition = (overallTime*920)+45;
   /* 12AM = top:20px, each subsequent hour is offset by 45px, hence the formula */
   return overallPosition;
 };
