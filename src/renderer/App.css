@@ -24,7 +24,7 @@ body {
 
 ::-webkit-scrollbar-track {
   border-radius: var(--CornerSize);
-  margin: 15px;
+  margin: 5px;
   height: 80%;
 }
 
@@ -73,6 +73,7 @@ body {
   display: flex;
   flex-direction: row;
   position: absolute;
+  background-color: var(--Semi-Black);
 }
 
 .AppContent {
@@ -84,8 +85,10 @@ body {
   color: var(--Semi-White);
   z-index: 0;
   align-items: center;
+  align-content: center;
   padding: 20px;
   overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .SideBarBody {
@@ -141,7 +144,7 @@ body {
 @media screen and (max-width: 1000px) {
   .SideBarBody {
     min-width: 250px;
-    height: 100%;
+    height: 150%;
   }
 
   .SideBarCal {
@@ -149,6 +152,14 @@ body {
     align-content: center;
     align-self: center;
     justify-content: center;
+  }
+
+}
+
+@media screen and (max-height: 1000px) {
+  .AppContent {
+    overflow: scroll;
+    height: 150%;
   }
 }
 
@@ -186,7 +197,7 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: var(--CornerSize);
-  height: 100%;
+  height: 978px;
 }
 
 #TimeFormat {
@@ -195,7 +206,7 @@ body {
   color: var(--Semi-White);
   border: none;
   outline: none;
-  padding: 4px;
+  padding: 3px;
   margin-right: 12px;
   font-size: 12px;
   transition-duration: 0.2s;
@@ -210,7 +221,8 @@ body {
 .TimeElements {
   font-size: 12px;
   display: flex;
-  height: 100%;
+  min-height: 92.7%;
+  min-height: 92.7%;
   flex-direction: column;
   justify-content: space-between;
   align-items: end;
@@ -221,13 +233,24 @@ body {
 
 .WeeklyBody {
   background-color: var(--Dark-Grey);
+  background-color: #1d1d1d;
+  opacity: 1;
   display: flex;
   border-radius: var(--CornerSize);
-  height: 100%;
+  height: 976px;
   min-width: 630px;
   max-width: 630px;
   margin-right: 20px;
   position: relative;
+}
+
+.WeeklyBody:hover {
+  background-size: 1px 38.8px;
+  background-position: 0px 4px;
+  background-image: repeating-linear-gradient(0deg, #080808, #080808 1px, #1d1d1d 1px, #1d1d1d);
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
+
 }
 
 .WeeklyBody:hover .DeleteButton,
@@ -310,8 +333,12 @@ body {
 }
 
 .ConflictOverlay {
+  border-radius: 8px;
   background-color: rgba(255, 0, 0, 0.1);
-  /* outline: red solid 2px; */
+  outline: rgba(255, 0, 0, 0.2) solid 2px;
+  opacity: 0.8;
+  background-size: 10px 10px;
+  background-image: repeating-linear-gradient(45deg, rgba(255, 0, 0, 0.2) 0, rgba(255, 0, 0, 0.2) 1px, rgba(255, 0, 0, 0.1) 0, rgba(255, 0, 0, 0.1) 50%);
   padding: 4px;
   margin: 4px 0;
   color: white;
@@ -323,7 +350,7 @@ body {
 
 .FreeTimeOverlay {
   background-color: rgba(0, 255, 0, 0.1);
-  /* outline: red solid 2px; */
+  border-radius: 8px;
   padding: 4px;
   margin: 4px 0;
   color: white;
