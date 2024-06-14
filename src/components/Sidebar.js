@@ -15,7 +15,8 @@ function Sidebar({
   setEventDetailVisibility,
   FreeTimeVisibility,
   ConflictVisibility,
-  EventDetailVisibility
+  EventDetailVisibility,
+  setAboutVisibility
 }) {
   const [deckName, setDeckName] = useState('');
   const [scheduleNames, setScheduleNames] = useState(schedules.map(() => ''));
@@ -64,7 +65,7 @@ function Sidebar({
 
   return (
     <div className="SideBarBody">
-      <h1 id='Title'>TimeTablez</h1>
+      <h1 id='Title' onClick={setAboutVisibility}>TimeTablez</h1>
       <textarea
         id='DeckName'
         type="text"
@@ -75,13 +76,13 @@ function Sidebar({
       <label className='SidebarText' onClick={exportComparison}>⇱ Export Comparison</label>
       <input type='file' accept='.json' onChange={importComparison} style={{ display: 'none' }} id='importComparisonInput' />
       <label htmlFor='importComparisonInput' className='SidebarText'>⇲ Import Comparison</label>
-      <p>Colour Overlays</p>
+      <p className='LabelText'>Colour Overlays</p>
       <div className='ColorOverlayList'>
         <p className={`ColorType ${FreeTimeVisibility ? 'SelectedColorType' : 'UnSelectedColorType'}`} onClick={setFreeTimeVisibility}>Shared Free Time</p>
         <p className={`ColorType ${ConflictVisibility ? 'SelectedColorType' : 'UnSelectedColorType'}`} onClick={setConflictVisibility}>Schedule Conflicts</p>
         <p className={`ColorType ${EventDetailVisibility ? 'SelectedColorType' : 'UnSelectedColorType'}`} onClick={setEventDetailVisibility}>Event Details</p>
       </div>
-      <p>Visible Schedules</p>
+      <p className='LabelText'>Visible Schedules</p>
       <div className='VisibleSchedules'>
         {schedules.map((schedule, index) => {
           const getScheduleName = (schedule) => {

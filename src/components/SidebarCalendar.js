@@ -75,7 +75,7 @@ function SidebarCalendar({ updateSelectedWeekRange }) {
         <div>
             <div id='DateDisplay'>
                 <button onClick={() => handleMonthChange(-1)} className='MonthButton'>⮜</button>
-                <h2 align="center" id='MonthName'>
+                <h2 align="center" id='MonthName' className='LabelText'>
                     {monthNames[month - 1]}
                 </h2>
                 <input
@@ -91,13 +91,13 @@ function SidebarCalendar({ updateSelectedWeekRange }) {
             <table cellSpacing="4" cellPadding="8" id='DateTable'>
                 <thead>
                     <tr>
-                        <th>M</th>
-                        <th>T</th>
-                        <th>W</th>
-                        <th>T</th>
-                        <th>F</th>
-                        <th>S</th>
-                        <th>S</th>
+                        <th className='LabelText'>M</th>
+                        <th className='LabelText'>T</th>
+                        <th className='LabelText'>W</th>
+                        <th className='LabelText'>T</th>
+                        <th className='LabelText'>F</th>
+                        <th className='LabelText'>S</th>
+                        <th className='LabelText'>S</th>
                     </tr>
                 </thead>
 

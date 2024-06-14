@@ -37,6 +37,14 @@ body {
 #Title {
   font-weight: bold;
   font-size: 22px;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
+}
+
+#Title:hover {
+  text-shadow: 4px 0px green, 8px 0px red, 12px 0px blue;
+  ;
+  cursor: pointer;
 }
 
 .SidebarText {
@@ -190,6 +198,10 @@ body {
   border-radius: var(--CornerSize);
 }
 
+.LabelText {
+  cursor: default;
+}
+
 .ScheduleCheckbox {
   display: flex;
   align-content: center;
@@ -232,6 +244,7 @@ body {
   padding-right: 12px;
   color: var(--Semi-White);
   list-style-type: none;
+  cursor: default;
 }
 
 .WeeklyBody {
@@ -291,6 +304,7 @@ body {
 .DayText {
   align-self: center;
   margin-bottom: 6px;
+  cursor: default;
 }
 
 .DayDivider {
@@ -491,4 +505,50 @@ th:last-child {
   text-align: center;
   background-color: var(--Semi-Black);
   align-self: center;
+}
+
+.AboutBody {
+  color: var(--Semi-White);
+  background: var(--Dark-Grey);
+  background: linear-gradient(90deg, var(--Dark-Grey) 0%, var(--Semi-Black) 84%);
+  background-size: 430px 1px;
+  background-position: -100px;
+  display: flex;
+  border-top-right-radius: var(--CornerSize);
+  border-bottom-right-radius: var(--CornerSize);
+  height: 100%;
+  margin-right: 20px;
+  align-content: center;
+  align-items: center;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+  overflow: hidden;
+}
+
+.LogoSection {
+  width: 100%;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.AboutItem {
+  display: flex;
+  flex-direction: row;
+  margin: 2px;
+  padding: 4px;
+}
+
+.AboutLink:hover {
+  color: gray;
+  cursor: pointer;
+}
+
+#AppDescription {
+  color: gray;
+  font-size: 12px;
+  margin-top: 0px;
 }

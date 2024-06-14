@@ -7,6 +7,7 @@ import NewWeeklyCard from '../components/NewWeeklyCard';
 import '../renderer/App.css'
 import WeeklyTime from '../components/WeeklyTime';
 import { findCommonTimes } from "../scripts/eventCompare";
+import About from "../components/About";
 
 function Home() {
   const [fileDataList, setFileDataList] = useState([]);
@@ -87,6 +88,12 @@ function Home() {
     setEventDetailVisibility(!EventDetailVisibility);
   };
 
+  const [AboutVisibility, setAboutVisibility] = useState(false);
+
+  const updateAboutVisibility = (state) => {
+    setAboutVisibility(!AboutVisibility);
+  }
+
   return (
     <div className="AppBody">
       <Sidebar
@@ -101,7 +108,10 @@ function Home() {
         FreeTimeVisibility={FreeTimeVisibility}
         ConflictVisibility={ConflictVisibility}
         EventDetailVisibility={EventDetailVisibility}
+        setAboutVisibility={updateAboutVisibility}
         />
+      <About
+        AboutVisibility={AboutVisibility}/>
       <div className="AppContent">
         <WeeklyTime timeFormat={timeFormat} handleChange={handleFormatChange}/>
         {visibleSchedules.map((fileData, index) => (

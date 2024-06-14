@@ -1,12 +1,10 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.6.0",
-  "description": "A foundation for scalable desktop apps",
-  "license": "MIT",
+  "name": "TimeTablez",
+  "version": "1.0.0",
+  "description": "ICS schedule comparison app",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Ricky Huynh",
+    "url": "https://github.com/zzz-Ricky"
   },
   "main": "./dist/main/main.js",
   "scripts": {
