@@ -193,7 +193,8 @@
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "icon": "assets/icons/icon.icns"
     },
     "dmg": {
       "contents": [
@@ -207,19 +208,22 @@
           "type": "link",
           "path": "/Applications"
         }
-      ]
+      ],
+      "icon": "assets/icon.icns"
     },
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "assets/icon.ico"
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false
     },
     "linux": {
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Development",
+      "icon": "assets/icons"
     },
     "directories": {
       "app": "release/app",
