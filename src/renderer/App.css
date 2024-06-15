@@ -526,6 +526,7 @@ th:last-child {
   flex-direction: column;
   cursor: default;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .LogoSection {
