@@ -1,7 +1,9 @@
 {
   "name": "TimeTablez",
   "version": "1.0.0",
+  "productName": "TimeTablez",
   "description": "ICS schedule comparison app",
+  "icon": "../../assets/icon.png",
   "author": {
     "name": "Ricky Huynh",
     "url": "https://github.com/zzz-Ricky"
